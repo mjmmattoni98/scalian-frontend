@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
 interface Candidate {
   name: string;
@@ -12,7 +13,7 @@ interface Candidate {
 @Component({
   selector: 'candidates-table',
   standalone: true,
-  imports: [MatTableModule],
+  imports: [MatTableModule, MatPaginatorModule],
   template: `
     <table mat-table [dataSource]="candidates" class="mat-elevation-z8">
       <ng-container matColumnDef="name">
@@ -40,25 +41,33 @@ interface Candidate {
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    @if (!candidates.length) {
-    <p>No candidates loaded yet.</p>
-    }
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+      aria-label="Select page of periodic elements"
+    />
   `,
   styles: `table { width: 100%; margin: 2rem auto; }`,
 })
-export class Table implements OnInit {
+export class Table implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'surname', 'seniority', 'years', 'availability'];
-  candidates: Candidate[] = [];
+  candidates = new MatTableDataSource<Candidate>([]);
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngOnInit() {
     this.loadCandidates();
     window.addEventListener('storage', () => this.loadCandidates());
-    // Optionally, listen for a custom event to refresh
     window.addEventListener('candidateAdded', () => this.loadCandidates());
+  }
+
+  ngAfterViewInit() {
+    this.candidates.paginator = this.paginator;
   }
 
   loadCandidates() {
     const stored = localStorage.getItem('candidates');
-    this.candidates = stored ? JSON.parse(stored) : [];
+    this.candidates.data = stored ? JSON.parse(stored) : [];
   }
 }
