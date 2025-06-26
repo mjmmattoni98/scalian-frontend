@@ -27,19 +27,28 @@ import { MatInputModule } from '@angular/material/input';
       <mat-form-field appearance="outline">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name" required />
-        <mat-error
-          *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
-          >Name is required</mat-error
-        >
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+        }
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Surname</mat-label>
         <input matInput formControlName="surname" required />
-        <mat-error
-          *ngIf="form.get('surname')?.invalid && form.get('surname')?.touched"
-          >Valid surname is required</mat-error
-        >
+        @if (form.get('surname')?.invalid && form.get('surname')?.touched) {
+        <mat-error>Valid surname is required</mat-error>
+        }
       </mat-form-field>
+      <input
+        type="file"
+        accept=".xlsx,.xls"
+        (change)="onFileSelected($event)"
+        [class.ng-invalid]="fileInputInvalid"
+        required
+        style="margin-bottom: 1rem;"
+      />
+      @if (fileInputInvalid) {
+        <mat-error>Please select an Excel file.</mat-error>
+      }
       <button
         mat-raised-button
         color="primary"
@@ -51,7 +60,8 @@ import { MatInputModule } from '@angular/material/input';
     </form>
     @if (submitted) {
     <p style="color: green;">
-      Form submitted! Name: {{ form.value.name }}, Surname: {{ form.value.surname }}
+      Form submitted! Name: {{ form.value.name }}, Surname:
+      {{ form.value.surname }}
     </p>
     }
   `,
@@ -60,6 +70,9 @@ import { MatInputModule } from '@angular/material/input';
 export class Form {
   form: FormGroup;
   submitted = false;
+  selectedFile: File | null = null;
+  selectedFileName: string = '';
+  fileInputInvalid = false;
 
   constructor(private readonly fb: FormBuilder) {
     this.form = this.fb.group({
@@ -68,9 +81,35 @@ export class Form {
     });
   }
 
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const fileName = file.name.toLowerCase();
+      const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+      if (isExcel) {
+        this.selectedFile = file;
+        this.selectedFileName = file.name;
+        this.fileInputInvalid = false;
+      } else {
+        this.selectedFile = null;
+        this.selectedFileName = '';
+        this.fileInputInvalid = true;
+      }
+    } else {
+      this.selectedFile = null;
+      this.selectedFileName = '';
+      this.fileInputInvalid = true;
+    }
+  }
+
   onSubmit() {
-    if (this.form.valid) {
+    if (this.form.valid && this.selectedFile) {
       this.submitted = true;
+      this.fileInputInvalid = false;
+    } else if (!this.selectedFile) {
+      this.fileInputInvalid = true;
+      this.submitted = false;
     }
   }
 }
