@@ -54,7 +54,7 @@ import { ToastService } from './toast';
         style="margin-bottom: 1rem;"
       />
       @if (fileInputInvalid) {
-        <mat-error>Please select an Excel file.</mat-error>
+      <mat-error>Please select an Excel file.</mat-error>
       }
       <button
         mat-raised-button
@@ -115,22 +115,29 @@ export class Form {
       this.submitted = true;
       this.fileInputInvalid = false;
       const { name, surname } = this.form.value;
-      this.uploadService.uploadCandidate(name, surname, this.selectedFile).subscribe({
-        next: (candidate: CandidateUploadResponse) => {
-          // Store incrementally in localStorage
-          const key = 'candidates';
-          const stored = localStorage.getItem(key);
-          let candidates: CandidateUploadResponse[] = stored ? JSON.parse(stored) : [];
-          candidates.push(candidate);
-          localStorage.setItem(key, JSON.stringify(candidates));
-          this.candidateAdded.emit();
-          window.dispatchEvent(new Event('candidateAdded'));
-        },
-        error: (err) => {
-          const msg = err?.error?.message ?? 'Upload failed';
-          this.toast.show(msg, 'Close');
-        }
-      });
+      this.uploadService
+        .uploadCandidate(name, surname, this.selectedFile)
+        .subscribe({
+          next: (candidate: CandidateUploadResponse) => {
+            const key = 'candidates';
+            const stored = localStorage.getItem(key);
+            let candidates: CandidateUploadResponse[] = stored
+              ? JSON.parse(stored)
+              : [];
+            candidates.push(candidate);
+            localStorage.setItem(key, JSON.stringify(candidates));
+            this.candidateAdded.emit();
+            window.dispatchEvent(new Event('candidateAdded'));
+            this.toast.show(
+              `Candidate ${candidate.name} ${candidate.surname} loaded successfully!`,
+              'Close'
+            );
+          },
+          error: (err) => {
+            const msg = err?.error?.message ?? 'Upload failed';
+            this.toast.show(msg, 'Close');
+          },
+        });
     } else if (!this.selectedFile) {
       this.fileInputInvalid = true;
       this.submitted = false;
