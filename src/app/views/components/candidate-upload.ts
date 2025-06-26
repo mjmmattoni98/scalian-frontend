@@ -14,7 +14,7 @@ export interface CandidateUploadResponse {
 export class CandidateUploadService {
   private readonly uploadUrl = 'http://localhost:3000/api/candidates/upload';
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   uploadCandidate(name: string, surname: string, file: File): Observable<CandidateUploadResponse> {
     const formData = new FormData();
