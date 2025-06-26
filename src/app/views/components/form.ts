@@ -13,7 +13,7 @@ import {
   CandidateUploadResponse,
   CandidateUploadService,
 } from './candidate-upload';
-import { ToastService } from './toast.service';
+import { ToastService } from './toast';
 
 @Component({
   selector: 'candidates-form',
