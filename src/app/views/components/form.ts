@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,6 +8,11 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import {
+  CandidateUploadService,
+  CandidateUploadResponse,
+} from './candidate-upload';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'candidates-form',
@@ -17,6 +22,7 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
     MatButtonModule,
     ReactiveFormsModule,
+    HttpClientModule,
   ],
   template: `
     <form
@@ -53,17 +59,11 @@ import { MatInputModule } from '@angular/material/input';
         mat-raised-button
         color="primary"
         type="submit"
-        [disabled]="form.invalid"
+        [disabled]="form.invalid || !selectedFile"
       >
         Submit
       </button>
     </form>
-    @if (submitted) {
-    <p style="color: green;">
-      Form submitted! Name: {{ form.value.name }}, Surname:
-      {{ form.value.surname }}
-    </p>
-    }
   `,
   styles: ``,
 })
@@ -74,7 +74,12 @@ export class Form {
   selectedFileName: string = '';
   fileInputInvalid = false;
 
-  constructor(private readonly fb: FormBuilder) {
+  @Output() candidateAdded = new EventEmitter<void>();
+
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly uploadService: CandidateUploadService
+  ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
       surname: ['', [Validators.required]],
@@ -107,6 +112,22 @@ export class Form {
     if (this.form.valid && this.selectedFile) {
       this.submitted = true;
       this.fileInputInvalid = false;
+      const { name, surname } = this.form.value;
+      this.uploadService.uploadCandidate(name, surname, this.selectedFile).subscribe({
+        next: (candidate: CandidateUploadResponse) => {
+          // Store incrementally in localStorage
+          const key = 'candidates';
+          const stored = localStorage.getItem(key);
+          let candidates: CandidateUploadResponse[] = stored ? JSON.parse(stored) : [];
+          candidates.push(candidate);
+          localStorage.setItem(key, JSON.stringify(candidates));
+          this.candidateAdded.emit();
+          window.dispatchEvent(new Event('candidateAdded'));
+        },
+        error: () => {
+          // handle error (optional)
+        }
+      });
     } else if (!this.selectedFile) {
       this.fileInputInvalid = true;
       this.submitted = false;
