@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,11 +8,12 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {
-  CandidateUploadService,
   CandidateUploadResponse,
+  CandidateUploadService,
 } from './candidate-upload';
-import { HttpClientModule } from '@angular/common/http';
+import { ToastService } from './toast.service';
 
 @Component({
   selector: 'candidates-form',
@@ -22,7 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatInputModule,
     MatButtonModule,
     ReactiveFormsModule,
-    HttpClientModule,
+    MatSnackBarModule,
   ],
   template: `
     <form
@@ -78,7 +79,8 @@ export class Form {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly uploadService: CandidateUploadService
+    private readonly uploadService: CandidateUploadService,
+    private readonly toast: ToastService
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -124,8 +126,9 @@ export class Form {
           this.candidateAdded.emit();
           window.dispatchEvent(new Event('candidateAdded'));
         },
-        error: () => {
-          // handle error (optional)
+        error: (err) => {
+          const msg = err?.error?.message ?? 'Upload failed';
+          this.toast.show(msg, 'Close');
         }
       });
     } else if (!this.selectedFile) {
