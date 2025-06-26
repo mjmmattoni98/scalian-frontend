@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,10 +9,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import {
   CandidateUploadResponse,
   CandidateUploadService,
 } from './candidate-upload';
+import { CandidatesStore } from './candidates-store';
 import { ToastService } from './toast';
 
 @Component({
@@ -75,12 +78,11 @@ export class Form {
   selectedFileName: string = '';
   fileInputInvalid = false;
 
-  @Output() candidateAdded = new EventEmitter<void>();
-
   constructor(
     private readonly fb: FormBuilder,
     private readonly uploadService: CandidateUploadService,
-    private readonly toast: ToastService
+    private readonly toast: ToastService,
+    private readonly candidatesStore: CandidatesStore
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -117,28 +119,22 @@ export class Form {
       const { name, surname } = this.form.value;
       this.uploadService
         .uploadCandidate(name, surname, this.selectedFile)
-        .subscribe({
-          next: (candidate: CandidateUploadResponse) => {
-            const key = 'candidates';
-            const stored = localStorage.getItem(key);
-            let candidates: CandidateUploadResponse[] = stored
-              ? JSON.parse(stored)
-              : [];
-            candidates.push(candidate);
-            localStorage.setItem(key, JSON.stringify(candidates));
-            this.candidateAdded.emit();
-            window.dispatchEvent(new Event('candidateAdded'));
+        .pipe(
+          tap((candidate: CandidateUploadResponse) => {
+            this.candidatesStore.add(candidate);
             this.toast.show(
               `Candidate ${candidate.name} ${candidate.surname} loaded successfully!`,
               4000,
               'success'
             );
-          },
-          error: (err) => {
+          }),
+          catchError((err) => {
             const msg = err?.error?.message ?? 'Upload failed';
             this.toast.show(msg, 4000, 'error');
-          },
-        });
+            return of();
+          })
+        )
+        .subscribe();
     } else if (!this.selectedFile) {
       this.fileInputInvalid = true;
       this.submitted = false;

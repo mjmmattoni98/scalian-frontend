@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, effect, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { CandidatesStore } from './candidates-store';
 
 interface Candidate {
   name: string;
@@ -100,26 +101,21 @@ interface Candidate {
     }
   `,
 })
-export class Table implements OnInit, AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-
+export class Table implements AfterViewInit {
   displayedColumns = ['name', 'surname', 'seniority', 'years', 'availability'];
   candidates = new MatTableDataSource<Candidate>([]);
 
-  ngOnInit() {
-    this.loadCandidates();
-    window.addEventListener('storage', () => this.loadCandidates());
-    window.addEventListener('candidateAdded', () => this.loadCandidates());
-  }
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngAfterViewInit() {
     this.candidates.paginator = this.paginator;
     this.candidates.sort = this.sort;
   }
 
-  loadCandidates() {
-    const stored = localStorage.getItem('candidates');
-    this.candidates.data = stored ? JSON.parse(stored) : [];
+  constructor(public candidatesStore: CandidatesStore) {
+    effect(() => {
+      this.candidates.data = this.candidatesStore.candidates();
+    });
   }
 }
