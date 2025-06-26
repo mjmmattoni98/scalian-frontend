@@ -130,12 +130,13 @@ export class Form {
             window.dispatchEvent(new Event('candidateAdded'));
             this.toast.show(
               `Candidate ${candidate.name} ${candidate.surname} loaded successfully!`,
-              'Close'
+              4000,
+              'success'
             );
           },
           error: (err) => {
             const msg = err?.error?.message ?? 'Upload failed';
-            this.toast.show(msg, 'Close');
+            this.toast.show(msg, 4000, 'error');
           },
         });
     } else if (!this.selectedFile) {
