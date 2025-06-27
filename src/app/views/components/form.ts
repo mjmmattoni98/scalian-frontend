@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
@@ -27,6 +28,7 @@ import { ToastService } from './toast';
     MatButtonModule,
     ReactiveFormsModule,
     MatSnackBarModule,
+    MatIconModule,
   ],
   template: `
     <form
@@ -48,14 +50,24 @@ import { ToastService } from './toast';
         <mat-error>Valid surname is required</mat-error>
         }
       </mat-form-field>
-      <input
-        type="file"
-        accept=".xlsx,.xls"
-        (change)="onFileSelected($event)"
-        [class.ng-invalid]="fileInputInvalid"
-        required
-        style="margin-bottom: 1rem;"
-      />
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          (click)="fileInput.click()"
+        >
+          <mat-icon>upload_file</mat-icon>
+          {{ selectedFileName || 'Choose Excel file...' }}
+        </button>
+        <input
+          #fileInput
+          type="file"
+          accept=".xlsx,.xls"
+          (change)="onFileSelected($event)"
+          style="display:none;"
+        />
+      </div>
       @if (fileInputInvalid) {
       <mat-error>Please select an Excel file.</mat-error>
       }
