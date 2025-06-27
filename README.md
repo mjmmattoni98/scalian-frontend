@@ -1,33 +1,20 @@
 # Scalian Frontend
 
-A modern frontend application for Scalian, built with Angular. This project needs to be executed with the backend from [https://github.com/mjmmattoni98/scalian-backend.git](https://github.com/mjmmattoni98/scalian-backend.git)
+A modern Angular frontend for candidate data upload and validation.
 
-## Table of Contents
+## Features
 
-- [Scalian Frontend](#scalian-frontend)
-  - [Table of Contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Running the Application](#running-the-application)
-    - [Building for Production](#building-for-production)
-  - [Available Scripts](#available-scripts)
+- Upload candidate data via Excel file and form fields
+- Show candidates uploaded in a table
+- Pagination and sorting of candidates
+- REST API integration with `/api` global prefix (see [scalian-backend](https://github.com/mjmmattoni98/scalian-backend.git))
+- Modern Angular architecture
 
 ## Getting Started
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [npm](https://www.npmjs.com/) (v9 or higher recommended)
-- [Angular CLI](https://angular.io/cli) (optional, for local development)
-
-### Installation
-
-Clone the repository and install dependencies:
+### Install dependencies
 
 ```bash
-git clone https://github.com/mjmmattoni98/scalian-frontend.git
-cd scalian-frontend
 npm install
 ```
 
@@ -48,6 +35,19 @@ npm run build
 ```
 
 The production-ready files will be in the `dist/` directory.
+
+## Usage
+
+- Fill in the candidate form and upload an Excel file with columns: seniority, years, availability (one row).
+- The frontend will validate and send the data to the backend API.
+
+## Testing
+
+Run all tests:
+
+```bash
+npm test
+```
 
 ## Available Scripts
 
