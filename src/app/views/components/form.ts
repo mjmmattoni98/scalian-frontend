@@ -139,6 +139,10 @@ export class Form {
               4000,
               'success'
             );
+            this.form.reset();
+            this.selectedFile = null;
+            this.selectedFileName = '';
+            this.submitted = false;
           }),
           catchError((err) => {
             const msg = err?.error?.message ?? 'Upload failed';
