@@ -1,59 +1,56 @@
-# ScalianFrontend
+# Scalian Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
+A modern frontend application for Scalian, built with Angular. This project needs to be executed with the backend from [https://github.com/mjmmattoni98/scalian-backend.git](https://github.com/mjmmattoni98/scalian-backend.git)
 
-## Development server
+## Table of Contents
 
-To start a local development server, run:
+- [Scalian Frontend](#scalian-frontend)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Running the Application](#running-the-application)
+    - [Building for Production](#building-for-production)
+  - [Available Scripts](#available-scripts)
 
-```bash
-ng serve
-```
+## Getting Started
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Prerequisites
 
-## Code scaffolding
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [npm](https://www.npmjs.com/) (v9 or higher recommended)
+- [Angular CLI](https://angular.io/cli) (optional, for local development)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Installation
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Clone the repository and install dependencies:
 
 ```bash
-ng build
+git clone https://github.com/mjmmattoni98/scalian-frontend.git
+cd scalian-frontend
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Running the Application
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Start the development server:
 
 ```bash
-ng test
+npm run start
 ```
 
-## Running end-to-end tests
+The app will be available at [http://localhost:4200](http://localhost:4200).
 
-For end-to-end (e2e) testing, run:
+### Building for Production
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The production-ready files will be in the `dist/` directory.
 
-## Additional Resources
+## Available Scripts
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- `npm run start` - Run the app in development mode.
+- `npm run build` - Build the app for production.
+- `npm run test` - Run unit tests.
