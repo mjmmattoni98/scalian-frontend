@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, effect, ViewChild } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -15,7 +16,7 @@ interface Candidate {
 @Component({
   selector: 'candidates-table',
   standalone: true,
-  imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatIconModule],
   template: `
     <table mat-table [dataSource]="candidates" matSort class="mat-elevation-z8">
       <ng-container matColumnDef="name">
@@ -84,6 +85,15 @@ interface Candidate {
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
+    @if (candidates.data.length === 0) {
+    <div class="empty-state" role="status" aria-live="polite">
+      <mat-icon color="primary" fontIcon="info" aria-hidden="true"
+        >info</mat-icon
+      >
+      <span>No candidates found. Upload candidates to get started.</span>
+    </div>
+    }
+
     <mat-paginator
       [pageSizeOptions]="[5, 10, 20]"
       showFirstLastButtons
@@ -95,7 +105,16 @@ interface Candidate {
       width: 100%; 
       margin: 2rem auto; 
     }
-    
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 3rem 0 2rem 0;
+      color: var(--quaternary-contrast, #888);
+      font-size: 1.1rem;
+      gap: 0.5rem;
+    }
     th.mat-sort-header-sorted {
       color: black;
     }
